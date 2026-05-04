@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LGPD Guia Interativo</title>
+  <link rel="stylesheet" href="../css/lgpd-guide.css">
+  <meta name="description" content="Guia interativo da Lei Geral de Proteção de Dados Pessoais (LGPD) - Lei 13.709/2018">
+  <meta name="theme-color" content="#0D0F1A">
+</head>
+<body>
+  <div class="lgpd-root">
+    <div class="hero">
+      <div class="hero-badge">Lei 13.709/2018</div>
+      <h1>LGPD<br><span>Guia Interativo</span></h1>
+      <p class="hero-sub">Lei Geral de Proteção de Dados Pessoais</p>
+      <div class="hero-stats">
+        <div class="hero-stat"><div class="hero-stat-num">10</div><div class="hero-stat-label">Seções</div></div>
+        <div class="hero-stat"><div class="hero-stat-num">10</div><div class="hero-stat-label">Princípios</div></div>
+        <div class="hero-stat"><div class="hero-stat-num">11</div><div class="hero-stat-label">Bases Legais</div></div>
+        <div class="hero-stat"><div class="hero-stat-num">R$50M</div><div class="hero-stat-label">Multa Máx.</div></div>
+      </div>
+    </div>
+
+    <nav class="nav-tabs">
+      <button class="tab-btn active" onclick="showTab('historico',this)">Histórico</button>
+      <button class="tab-btn" onclick="showTab('conceitos',this)">Conceitos</button>
+      <button class="tab-btn" onclick="showTab('principios',this)">Princípios</button>
+      <button class="tab-btn" onclick="showTab('bases',this)">Bases Legais</button>
+      <button class="tab-btn" onclick="showTab('agentes',this)">Agentes</button>
+      <button class="tab-btn new-tab" onclick="showTab('direitos',this)">Titulares</button>
+      <button class="tab-btn new-tab" onclick="showTab('dpo',this)">DPO</button>
+      <button class="tab-btn" onclick="showTab('sancoes',this)">Sanções</button>
+      <button class="tab-btn" onclick="showTab('seguranca',this)">Segurança</button>
+      <button class="tab-btn new-tab" onclick="showTab('ropa',this)">ROPA</button>
+    </nav>
+
+    <main class="content-area">
+      <div id="historico" class="section active"></div>
+      <div id="conceitos" class="section"></div>
+      <div id="principios" class="section"></div>
+      <div id="bases" class="section"></div>
+      <div id="agentes" class="section"></div>
+      <div id="direitos" class="section"></div>
+      <div id="dpo" class="section"></div>
+      <div id="sancoes" class="section"></div>
+      <div id="seguranca" class="section"></div>
+      <div id="ropa" class="section"></div>
+    </main>
+  </div>
+
+  <script src="../js/lgpd-guide.js"></script>
+  <script src="../js/sections.js"></script>
+</body>
+</html>

@@ -1,0 +1,448 @@
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;700;800&family=Space+Mono:wght@400;700&display=swap');
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  .lgpd-root { font-family: 'Syne', sans-serif; background: var(--color-background-tertiary); min-height: 100vh; }
+  .hero { background: #0D0F1A; color: #fff; padding: 3rem 2rem 2rem; position: relative; overflow: hidden; }
+  .hero::before { content: ''; position: absolute; top: -60px; right: -60px; width: 300px; height: 300px; border-radius: 50%; border: 1px solid rgba(255,120,30,0.15); }
+  .hero::after { content: ''; position: absolute; top: -20px; right: -20px; width: 180px; height: 180px; border-radius: 50%; border: 1px solid rgba(255,120,30,0.25); }
+  .hero-badge { display: inline-block; font-family: 'Space Mono', monospace; font-size: 11px; background: rgba(255,120,30,0.15); color: #FF781E; border: 1px solid rgba(255,120,30,0.3); padding: 4px 12px; border-radius: 20px; margin-bottom: 1rem; letter-spacing: 0.05em; }
+  .hero h1 { font-size: 2.2rem; font-weight: 800; line-height: 1.1; margin-bottom: 0.5rem; letter-spacing: -0.02em; }
+  .hero h1 span { color: #FF781E; }
+  .hero-sub { font-size: 0.9rem; color: rgba(255,255,255,0.5); font-weight: 400; margin-bottom: 1.5rem; }
+  .hero-stats { display: flex; gap: 1.5rem; flex-wrap: wrap; }
+  .hero-stat { display: flex; flex-direction: column; gap: 2px; }
+  .hero-stat-num { font-size: 1.4rem; font-weight: 700; color: #FF781E; }
+  .hero-stat-label { font-size: 0.75rem; color: rgba(255,255,255,0.4); font-family: 'Space Mono', monospace; }
+  .nav-tabs { display: flex; overflow-x: auto; background: #0D0F1A; border-top: 1px solid rgba(255,255,255,0.08); padding: 0 0.5rem; gap: 0; scrollbar-width: none; }
+  .nav-tabs::-webkit-scrollbar { display: none; }
+  .tab-btn { font-family: 'Space Mono', monospace; font-size: 10px; padding: 0.9rem 0.85rem; border: none; background: transparent; color: rgba(255,255,255,0.4); cursor: pointer; white-space: nowrap; border-bottom: 2px solid transparent; letter-spacing: 0.03em; transition: color 0.2s, border-color 0.2s; }
+  .tab-btn.active { color: #FF781E; border-bottom-color: #FF781E; }
+  .tab-btn:hover:not(.active) { color: rgba(255,255,255,0.7); }
+  .tab-btn.new-tab { position: relative; }
+  .tab-btn.new-tab::after { content: 'novo'; position: absolute; top: 6px; right: 2px; font-size: 8px; background: #FF781E; color: #fff; padding: 1px 4px; border-radius: 4px; letter-spacing: 0; }
+  .content-area { padding: 1.5rem 1.5rem 3rem; max-width: 680px; }
+  .section { display: none; }
+  .section.active { display: block; }
+  .section-title { font-size: 1.1rem; font-weight: 700; color: var(--color-text-primary); margin-bottom: 1.2rem; padding-bottom: 0.6rem; border-bottom: 1px solid var(--color-border-tertiary); letter-spacing: -0.01em; }
+  .card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 1.2rem; }
+  .info-card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem; }
+  .info-card.accent { border-left: 3px solid #FF781E; }
+  .info-card.full { grid-column: 1/-1; }
+  .card-label { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--color-text-tertiary); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 6px; }
+  .card-value { font-size: 0.95rem; font-weight: 500; color: var(--color-text-primary); line-height: 1.4; }
+  .card-detail { font-size: 0.8rem; color: var(--color-text-secondary); margin-top: 4px; line-height: 1.5; }
+  .orange-num { font-size: 1.8rem; font-weight: 800; color: #FF781E; font-family: 'Space Mono', monospace; line-height: 1; margin-bottom: 4px; }
+  .timeline-item { display: flex; gap: 12px; padding: 0.8rem 0; border-bottom: 0.5px solid var(--color-border-tertiary); align-items: flex-start; }
+  .timeline-item:last-child { border-bottom: none; }
+  .tl-year { font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 700; color: #FF781E; min-width: 44px; margin-top: 2px; }
+  .tl-flag { font-size: 14px; min-width: 20px; }
+  .tl-text { font-size: 0.85rem; color: var(--color-text-primary); line-height: 1.4; }
+  .tl-sub { font-size: 0.75rem; color: var(--color-text-secondary); margin-top: 2px; }
+  .principle-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 1rem; }
+  .principle-card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 0.9rem; cursor: pointer; transition: border-color 0.2s; }
+  .principle-card:hover { border-color: var(--color-border-secondary); }
+  .principle-card.selected { border-color: #FF781E; border-width: 1.5px; }
+  .principle-icon { width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 14px; margin-bottom: 8px; background: rgba(255,120,30,0.1); color: #FF781E; font-weight: 700; font-family: 'Space Mono', monospace; }
+  .principle-name { font-size: 0.85rem; font-weight: 500; color: var(--color-text-primary); }
+  .principle-detail { display: none; background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 1rem; margin-top: 10px; font-size: 0.85rem; color: var(--color-text-secondary); line-height: 1.6; }
+  .principle-detail.show { display: block; }
+  .bases-table { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); overflow: hidden; margin-bottom: 1rem; }
+  .bt-row { display: grid; grid-template-columns: 1fr 60px 60px; padding: 0.65rem 1rem; border-bottom: 0.5px solid var(--color-border-tertiary); align-items: center; font-size: 0.82rem; }
+  .bt-row:last-child { border-bottom: none; }
+  .bt-header { font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 0.05em; color: var(--color-text-tertiary); background: var(--color-background-secondary); text-transform: uppercase; font-weight: 400; }
+  .bt-base { color: var(--color-text-primary); font-weight: 400; }
+  .check-yes { width: 20px; height: 20px; border-radius: 50%; background: rgba(30,160,100,0.15); color: #1EA064; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; margin: 0 auto; }
+  .check-no { width: 20px; height: 20px; border-radius: 50%; background: rgba(220,60,60,0.1); color: #DC3C3C; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; margin: 0 auto; }
+  .agent-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 1rem; }
+  .agent-card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem; }
+  .agent-role { font-size: 0.7rem; font-family: 'Space Mono', monospace; color: #FF781E; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 6px; }
+  .agent-name { font-size: 1rem; font-weight: 700; color: var(--color-text-primary); margin-bottom: 8px; }
+  .agent-traits { list-style: none; display: flex; flex-direction: column; gap: 4px; }
+  .agent-traits li { font-size: 0.78rem; color: var(--color-text-secondary); padding-left: 12px; position: relative; line-height: 1.4; }
+  .agent-traits li::before { content: '—'; position: absolute; left: 0; color: #FF781E; font-size: 10px; }
+  .flow-wrap { display: flex; align-items: center; gap: 6px; background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem; margin-bottom: 1rem; flex-wrap: wrap; }
+  .flow-node { background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 6px 12px; font-size: 0.78rem; font-weight: 500; color: var(--color-text-primary); white-space: nowrap; }
+  .flow-arrow { font-size: 14px; color: #FF781E; font-family: 'Space Mono', monospace; }
+  .sanctions-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 1rem; }
+  .sanction-item { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 0.75rem 1rem; display: flex; align-items: center; gap: 10px; font-size: 0.85rem; color: var(--color-text-primary); }
+  .sanction-dot { width: 8px; height: 8px; border-radius: 50%; background: #FF781E; flex-shrink: 0; }
+  .fine-card { background: #0D0F1A; border-radius: var(--border-radius-lg); padding: 1.2rem; margin-bottom: 1rem; text-align: center; }
+  .fine-amount { font-family: 'Space Mono', monospace; font-size: 1.6rem; font-weight: 700; color: #FF781E; }
+  .fine-label { font-size: 0.78rem; color: rgba(255,255,255,0.4); margin-top: 4px; }
+  .incident-flow { display: flex; flex-direction: column; gap: 8px; margin-bottom: 1rem; }
+  .if-step { display: flex; gap: 12px; align-items: flex-start; }
+  .if-num { font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700; color: #FF781E; background: rgba(255,120,30,0.1); border: 1px solid rgba(255,120,30,0.2); width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; }
+  .if-content { flex: 1; }
+  .if-title { font-size: 0.85rem; font-weight: 500; color: var(--color-text-primary); margin-bottom: 3px; }
+  .if-desc { font-size: 0.78rem; color: var(--color-text-secondary); line-height: 1.5; }
+  .if-connector { width: 1px; height: 10px; background: var(--color-border-secondary); margin-left: 11px; }
+  .highlight-box { background: rgba(255,120,30,0.07); border: 1px solid rgba(255,120,30,0.2); border-radius: var(--border-radius-md); padding: 0.85rem 1rem; font-size: 0.82rem; color: var(--color-text-primary); line-height: 1.6; margin-bottom: 1rem; }
+  .highlight-box strong { color: #FF781E; font-weight: 500; }
+  .ropa-block { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); overflow: hidden; margin-bottom: 1rem; }
+  .ropa-header { background: #0D0F1A; color: #FF781E; font-family: 'Space Mono', monospace; font-size: 11px; letter-spacing: 0.06em; padding: 0.65rem 1rem; text-transform: uppercase; }
+  .ropa-row { display: flex; justify-content: space-between; padding: 0.6rem 1rem; border-bottom: 0.5px solid var(--color-border-tertiary); font-size: 0.82rem; align-items: center; }
+  .ropa-row:last-child { border-bottom: none; }
+  .ropa-key { color: var(--color-text-secondary); }
+  .ropa-val { color: var(--color-text-primary); font-weight: 500; }
+  /* Direitos dos titulares */
+  .right-card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 0.9rem 1rem; display: flex; gap: 12px; align-items: flex-start; margin-bottom: 8px; cursor: pointer; transition: border-color 0.2s; }
+  .right-card:hover { border-color: var(--color-border-secondary); }
+  .right-num { font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 700; color: #FF781E; background: rgba(255,120,30,0.1); border: 1px solid rgba(255,120,30,0.2); min-width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .right-body { flex: 1; }
+  .right-title { font-size: 0.88rem; font-weight: 500; color: var(--color-text-primary); margin-bottom: 3px; }
+  .right-desc { font-size: 0.78rem; color: var(--color-text-secondary); line-height: 1.5; }
+  /* DPO */
+  .dpo-tri { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 1rem; }
+  .dpo-node { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 0.85rem; text-align: center; }
+  .dpo-icon { font-size: 22px; margin-bottom: 6px; }
+  .dpo-lbl { font-size: 0.75rem; font-weight: 500; color: var(--color-text-primary); }
+  .dpo-center { background: rgba(255,120,30,0.07); border: 1.5px solid rgba(255,120,30,0.3); }
+  .dpo-center .dpo-lbl { color: #FF781E; }
+  .dpo-arrow { display: flex; align-items: center; justify-content: center; font-size: 18px; color: #FF781E; font-family: 'Space Mono', monospace; }
+  /* ROPA steps */
+  .ropa-steps { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 1rem; }
+  .ropa-step { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 0.85rem; }
+  .rs-num { font-family: 'Space Mono', monospace; font-size: 10px; color: #FF781E; margin-bottom: 5px; }
+  .rs-title { font-size: 0.82rem; font-weight: 500; color: var(--color-text-primary); margin-bottom: 3px; }
+  .rs-desc { font-size: 0.75rem; color: var(--color-text-secondary); line-height: 1.4; }
+  .tag-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 1rem; }
+  .tag { font-size: 0.75rem; background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); color: var(--color-text-secondary); padding: 4px 10px; border-radius: 20px; font-family: 'Space Mono', monospace; }
+  .tag.orange { background: rgba(255,120,30,0.1); border-color: rgba(255,120,30,0.25); color: #FF781E; }
+</style>
+
+<div class="lgpd-root">
+  <div class="hero">
+    <div class="hero-badge">Lei 13.709/2018 — Versão completa</div>
+    <h1>LGPD<br><span>Guia Interativo</span></h1>
+    <p class="hero-sub">Lei Geral de Proteção de Dados Pessoais</p>
+    <div class="hero-stats">
+      <div class="hero-stat"><div class="hero-stat-num">10</div><div class="hero-stat-label">seções</div></div>
+      <div class="hero-stat"><div class="hero-stat-num">10</div><div class="hero-stat-label">princípios</div></div>
+      <div class="hero-stat"><div class="hero-stat-num">11</div><div class="hero-stat-label">bases legais</div></div>
+      <div class="hero-stat"><div class="hero-stat-num">R$50M</div><div class="hero-stat-label">multa máx.</div></div>
+    </div>
+  </div>
+
+  <nav class="nav-tabs">
+    <button class="tab-btn active" onclick="showTab('historico',this)">Histórico</button>
+    <button class="tab-btn" onclick="showTab('conceitos',this)">Conceitos</button>
+    <button class="tab-btn" onclick="showTab('principios',this)">Princípios</button>
+    <button class="tab-btn" onclick="showTab('bases',this)">Bases Legais</button>
+    <button class="tab-btn" onclick="showTab('agentes',this)">Agentes</button>
+    <button class="tab-btn new-tab" onclick="showTab('direitos',this)">Titulares</button>
+    <button class="tab-btn new-tab" onclick="showTab('dpo',this)">DPO</button>
+    <button class="tab-btn" onclick="showTab('sancoes',this)">Sanções</button>
+    <button class="tab-btn" onclick="showTab('seguranca',this)">Segurança</button>
+    <button class="tab-btn new-tab" onclick="showTab('ropa',this)">ROPA</button>
+  </nav>
+
+  <div class="content-area">
+
+    <div id="historico" class="section active">
+      <p class="section-title">Histórico da proteção de dados</p>
+      <div class="card-grid">
+        <div class="info-card accent"><div class="orange-num">137</div><div class="card-value">países com lei de privacidade</div><div class="card-detail">em 2021, segundo a UNCTAD</div></div>
+        <div class="info-card"><div class="card-label">vigência plena no Brasil</div><div class="orange-num">2021</div><div class="card-detail">aprovada em 2018 (Lei 13.709)</div></div>
+      </div>
+      <div class="info-card full" style="margin-bottom:12px;"><div class="card-label">objetivo da lei — art. 1º</div><div class="card-value">Proteger a liberdade, privacidade e personalidade da pessoa natural</div></div>
+      <p class="section-title" style="margin-top:1.2rem;">Linha do tempo</p>
+      <div style="background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:0.5rem 1rem;">
+        <div class="timeline-item"><span class="tl-year">1890</span><span class="tl-flag">🇺🇸</span><div><div class="tl-text">Right to Privacy</div><div class="tl-sub">Primeira doutrina jurídica sobre privacidade</div></div></div>
+        <div class="timeline-item"><span class="tl-year">1948</span><span class="tl-flag">🌎</span><div><div class="tl-text">Declaração Universal dos Direitos Humanos</div><div class="tl-sub">Privacidade como direito fundamental</div></div></div>
+        <div class="timeline-item"><span class="tl-year">1970</span><span class="tl-flag">🇩🇪</span><div><div class="tl-text">Lei de Hesse</div><div class="tl-sub">Primeira lei de proteção de dados do mundo</div></div></div>
+        <div class="timeline-item"><span class="tl-year">1974</span><span class="tl-flag">🇺🇸</span><div><div class="tl-text">Privacy Act</div><div class="tl-sub">EUA regulamenta dados em arquivos federais</div></div></div>
+        <div class="timeline-item"><span class="tl-year">1988</span><span class="tl-flag">🇧🇷</span><div><div class="tl-text">Constituição Federal</div><div class="tl-sub">Art. 5º, X: intimidade e vida privada invioláveis</div></div></div>
+        <div class="timeline-item"><span class="tl-year">1995</span><span class="tl-flag">🇪🇺</span><div><div class="tl-text">Diretiva 95/46/CE</div><div class="tl-sub">União Europeia regula tratamento de dados</div></div></div>
+        <div class="timeline-item"><span class="tl-year">2014</span><span class="tl-flag">🇧🇷</span><div><div class="tl-text">Marco Civil da Internet</div><div class="tl-sub">Proteção de dados como princípio (art. 3º)</div></div></div>
+        <div class="timeline-item"><span class="tl-year">2016</span><span class="tl-flag">🇪🇺</span><div><div class="tl-text">GDPR</div><div class="tl-sub">Regulamento europeu — referência global para a LGPD</div></div></div>
+        <div class="timeline-item" style="border-bottom:none;"><span class="tl-year">2018</span><span class="tl-flag">🇧🇷</span><div><div class="tl-text">LGPD aprovada</div><div class="tl-sub">Vigência plena a partir de agosto de 2021</div></div></div>
+      </div>
+    </div>
+
+    <div id="conceitos" class="section">
+      <p class="section-title">Conceitos fundamentais — art. 5º</p>
+      <div class="info-card full accent" style="margin-bottom:12px;"><div class="card-label">dado pessoal</div><div class="card-value">Qualquer informação relacionada a pessoa natural identificada ou identificável</div><div class="card-detail">Exemplos: nome, CPF, e-mail, endereço, profissão, idade</div></div>
+      <div class="info-card full" style="margin-bottom:12px;border-left:3px solid #DC3C3C;"><div class="card-label">dado pessoal sensível</div><div class="card-value">Dados com potencial discriminatório</div><div class="card-detail">Inclui: origem racial, convicção religiosa, opinião política, filiação sindical, dados de saúde, dados biométricos, dados de crianças e adolescentes</div></div>
+      <div class="card-grid">
+        <div class="info-card"><div class="card-label">titular de dados</div><div class="card-value">Pessoa natural a quem se referem os dados pessoais</div></div>
+        <div class="info-card"><div class="card-label">tratamento de dados</div><div class="card-value">Toda operação realizada com dados pessoais</div><div class="card-detail">Coleta, acesso, classificação, exclusão e outros</div></div>
+      </div>
+      <p class="section-title" style="margin-top:1.4rem;">Aplicação da lei — art. 3º</p>
+      <div class="highlight-box">A LGPD aplica-se a qualquer operação de tratamento realizada por <strong>pessoa física ou jurídica</strong>, por <strong>meio digital ou físico</strong>, <strong>independente do país da sede</strong> ou localização dos dados, desde que o tratamento ocorra no território nacional ou envolva indivíduos localizados no Brasil.</div>
+      <div class="info-card full" style="border-left:3px solid #DC3C3C;margin-bottom:1rem;"><div class="card-label">a lei não se aplica a:</div><div class="card-detail" style="font-size:0.83rem;line-height:1.7;">• Pessoas físicas para fins particulares e não econômicos<br>• Fins exclusivamente jornalísticos ou artísticos<br>• Fins acadêmicos (com exceção dos arts. 7º a 11)<br>• Segurança pública / esfera penal</div></div>
+      <p class="section-title">ANPD — Autoridade Nacional de Proteção de Dados</p>
+      <div class="info-card full accent"><div class="card-label">função — art. 55-J</div><div class="card-value">Zelar, regulamentar e fiscalizar o cumprimento da LGPD no Brasil</div><div class="card-detail" style="margin-top:8px;">Acesso: <span style="color:#FF781E;">www.gov.br/anpd/pt-br</span></div></div>
+    </div>
+
+    <div id="principios" class="section">
+      <p class="section-title">Princípios da LGPD — art. 6º</p>
+      <p style="font-size:0.82rem;color:var(--color-text-secondary);margin-bottom:1rem;">Clique em um princípio para ver detalhes</p>
+      <div class="principle-grid">
+        <div class="principle-card" onclick="togglePrinciple(this,'fin')"><div class="principle-icon">F</div><div class="principle-name">Finalidade</div></div>
+        <div class="principle-card" onclick="togglePrinciple(this,'nec')"><div class="principle-icon">N</div><div class="principle-name">Necessidade</div></div>
+        <div class="principle-card" onclick="togglePrinciple(this,'adeq')"><div class="principle-icon">A</div><div class="principle-name">Adequação</div></div>
+        <div class="principle-card" onclick="togglePrinciple(this,'tra')"><div class="principle-icon">T</div><div class="principle-name">Transparência</div></div>
+        <div class="principle-card" onclick="togglePrinciple(this,'seg')"><div class="principle-icon">S</div><div class="principle-name">Segurança</div></div>
+        <div class="principle-card" onclick="togglePrinciple(this,'prev')"><div class="principle-icon">P</div><div class="principle-name">Prevenção</div></div>
+        <div class="principle-card" onclick="togglePrinciple(this,'qual')"><div class="principle-icon">Q</div><div class="principle-name">Qualidade</div></div>
+        <div class="principle-card" onclick="togglePrinciple(this,'resp')"><div class="principle-icon">R</div><div class="principle-name">Responsabilização</div></div>
+      </div>
+      <div id="detail-fin" class="principle-detail"><strong style="color:var(--color-text-primary);">Finalidade</strong> — tratamento para propósitos legítimos, específicos, explícitos e informados ao titular; sem possibilidade de tratamento posterior incompatível.</div>
+      <div id="detail-nec" class="principle-detail"><strong style="color:var(--color-text-primary);">Necessidade</strong> — limitação do tratamento ao mínimo necessário para a realização das finalidades, com abrangência dos dados pertinentes e não excessivos.</div>
+      <div id="detail-adeq" class="principle-detail"><strong style="color:var(--color-text-primary);">Adequação</strong> — compatibilidade do tratamento com as finalidades informadas ao titular, de acordo com o contexto do tratamento.</div>
+      <div id="detail-tra" class="principle-detail"><strong style="color:var(--color-text-primary);">Transparência</strong> — garantia de informações claras, precisas e facilmente acessíveis sobre o tratamento, observado o segredo comercial do agente.</div>
+      <div id="detail-seg" class="principle-detail"><strong style="color:var(--color-text-primary);">Segurança</strong> — medidas técnicas e administrativas para proteger os dados de acessos não autorizados e situações acidentais ou ilícitas. Envolve <strong style="color:#FF781E;">C</strong>onfidencialidade, <strong style="color:#FF781E;">I</strong>ntegridade e <strong style="color:#FF781E;">D</strong>isponibilidade (tríade CID).</div>
+      <div id="detail-prev" class="principle-detail"><strong style="color:var(--color-text-primary);">Prevenção</strong> — adoção de medidas para prevenir a ocorrência de danos em virtude do tratamento de dados pessoais.</div>
+      <div id="detail-qual" class="principle-detail"><strong style="color:var(--color-text-primary);">Qualidade dos dados</strong> — garantia de exatidão, clareza, relevância e atualização dos dados, conforme a necessidade e o cumprimento da finalidade.</div>
+      <div id="detail-resp" class="principle-detail"><strong style="color:var(--color-text-primary);">Responsabilização e prestação de contas</strong> — demonstração pelo agente da adoção de medidas eficazes e capazes de comprovar o cumprimento das normas.</div>
+    </div>
+
+    <div id="bases" class="section">
+      <p class="section-title">Bases legais — arts. 7º e 11</p>
+      <div class="highlight-box">O tratamento de dados <strong>só pode ser realizado</strong> quando enquadrado em uma das hipóteses legais previstas na LGPD. Dados sensíveis possuem bases mais restritas.</div>
+      <div class="bases-table">
+        <div class="bt-row bt-header"><div>base legal</div><div style="text-align:center;">gerais</div><div style="text-align:center;">sensíveis</div></div>
+        <div class="bt-row"><div class="bt-base">Consentimento do titular</div><div><div class="check-yes">✓</div></div><div><div class="check-yes">✓</div></div></div>
+        <div class="bt-row"><div class="bt-base">Obrigação legal ou regulatória</div><div><div class="check-yes">✓</div></div><div><div class="check-yes">✓</div></div></div>
+        <div class="bt-row"><div class="bt-base">Execução de políticas públicas</div><div><div class="check-yes">✓</div></div><div><div class="check-yes">✓</div></div></div>
+        <div class="bt-row"><div class="bt-base">Estudos por órgãos de pesquisa</div><div><div class="check-yes">✓</div></div><div><div class="check-yes">✓</div></div></div>
+        <div class="bt-row"><div class="bt-base">Execução de contrato</div><div><div class="check-yes">✓</div></div><div><div class="check-no">✗</div></div></div>
+        <div class="bt-row"><div class="bt-base">Exercício regular de direitos</div><div><div class="check-yes">✓</div></div><div><div class="check-yes">✓</div></div></div>
+        <div class="bt-row"><div class="bt-base">Proteção da vida</div><div><div class="check-yes">✓</div></div><div><div class="check-yes">✓</div></div></div>
+        <div class="bt-row"><div class="bt-base">Tutela da saúde</div><div><div class="check-yes">✓</div></div><div><div class="check-yes">✓</div></div></div>
+        <div class="bt-row"><div class="bt-base">Interesse legítimo</div><div><div class="check-yes">✓</div></div><div><div class="check-no">✗</div></div></div>
+        <div class="bt-row"><div class="bt-base">Proteção do crédito</div><div><div class="check-yes">✓</div></div><div><div class="check-no">✗</div></div></div>
+        <div class="bt-row"><div class="bt-base">Prevenção a fraude / segurança</div><div><div class="check-no">✗</div></div><div><div class="check-yes">✓</div></div></div>
+      </div>
+    </div>
+
+    <div id="agentes" class="section">
+      <p class="section-title">Agentes de tratamento — art. 5º</p>
+      <div class="agent-cards">
+        <div class="agent-card" style="border-left:3px solid #FF781E;"><div class="agent-role">Controlador</div><div class="agent-name">Decide</div><ul class="agent-traits"><li>Define finalidade e meios do tratamento</li><li>Fornece instruções ao operador</li><li>Atua em nome próprio</li><li>Responde perante titulares e ANPD</li></ul></div>
+        <div class="agent-card"><div class="agent-role">Operador</div><div class="agent-name">Executa</div><ul class="agent-traits"><li>Realiza tratamento em nome do controlador</li><li>Segue instruções do controlador</li><li>Sem poder de decisão próprio</li><li>Pode ser pessoa física ou jurídica</li></ul></div>
+        <div class="agent-card" style="grid-column:1/-1;"><div class="agent-role">Co-controlador</div><div class="agent-name">Compartilha a decisão</div><ul class="agent-traits" style="flex-direction:row;flex-wrap:wrap;gap:8px;"><li style="min-width:45%;">Mais de um controlador com poder de decisão</li><li style="min-width:45%;">Objetivo em comum sobre o mesmo tratamento</li></ul></div>
+      </div>
+      <p class="section-title" style="margin-top:1.2rem;">Exemplo de cadeia</p>
+      <div class="flow-wrap"><div class="flow-node">Loja (controlador)</div><div class="flow-arrow">→</div><div class="flow-node">CRM SaaS (operador)</div><div class="flow-arrow">→</div><div class="flow-node">Servidor (suboperador)</div></div>
+      <p class="section-title" style="margin-top:1.2rem;">Responsabilidades do controlador</p>
+      <div class="sanctions-list">
+        <div class="sanction-item"><div class="sanction-dot"></div>Comprovar o consentimento do titular</div>
+        <div class="sanction-item"><div class="sanction-dot"></div>Comunicar incidentes à ANPD</div>
+        <div class="sanction-item"><div class="sanction-dot"></div>Atender titulares de dados</div>
+        <div class="sanction-item"><div class="sanction-dot"></div>Nomear Encarregado (DPO) — obrigatório exceto pequeno porte</div>
+        <div class="sanction-item"><div class="sanction-dot"></div>Manter registro das operações de tratamento (ROPA)</div>
+        <div class="sanction-item"><div class="sanction-dot"></div>Reparar danos aos titulares</div>
+      </div>
+    </div>
+
+    <!-- NOVA SEÇÃO: DIREITOS DOS TITULARES -->
+    <div id="direitos" class="section">
+      <p class="section-title">Direitos dos titulares — arts. 17 a 22</p>
+      <div class="highlight-box"><strong>Art. 17:</strong> Toda pessoa natural tem assegurada a titularidade de seus dados pessoais e os direitos fundamentais de liberdade, de intimidade e de privacidade. O titular <strong>não transfere</strong> a propriedade de seus dados ao permitir seu tratamento.</div>
+
+      <p style="font-size:0.82rem;color:var(--color-text-secondary);margin-bottom:0.8rem;">Direitos do art. 18 — exercidos gratuitamente, a qualquer momento, mediante requisição ao controlador (prazo: 15 dias)</p>
+
+      <div class="right-card"><div class="right-num">I</div><div class="right-body"><div class="right-title">Confirmação de existência</div><div class="right-desc">Saber se seus dados são tratados pelo controlador</div></div></div>
+      <div class="right-card"><div class="right-num">II</div><div class="right-body"><div class="right-title">Acesso aos dados</div><div class="right-desc">Obter cópia completa em formato eletrônico ou impresso, incluindo origem, critérios e finalidade do tratamento</div></div></div>
+      <div class="right-card"><div class="right-num">III</div><div class="right-body"><div class="right-title">Correção</div><div class="right-desc">Solicitar correção de dados incompletos, inexatos ou desatualizados</div></div></div>
+      <div class="right-card"><div class="right-num">IV</div><div class="right-body"><div class="right-title">Anonimização, bloqueio ou eliminação</div><div class="right-desc">Quando dados forem desnecessários, excessivos ou tratados em desconformidade com a LGPD</div></div></div>
+      <div class="right-card"><div class="right-num">V</div><div class="right-body"><div class="right-title">Portabilidade</div><div class="right-desc">Transferir seus dados a outro fornecedor de serviço (regulamentação da ANPD define o formato)</div></div></div>
+      <div class="right-card"><div class="right-num">VI</div><div class="right-body"><div class="right-title">Eliminação após revogação</div><div class="right-desc">Quando o consentimento é retirado, os dados coletados com base nele devem ser eliminados</div></div></div>
+      <div class="right-card"><div class="right-num">VII</div><div class="right-body"><div class="right-title">Informação sobre compartilhamento</div><div class="right-desc">Saber com quais entidades públicas e privadas o controlador compartilhou seus dados</div></div></div>
+      <div class="right-card"><div class="right-num">VIII</div><div class="right-body"><div class="right-title">Informação sobre não consentimento</div><div class="right-desc">Ser informado sobre a possibilidade de não fornecer consentimento e quais são as consequências</div></div></div>
+      <div class="right-card"><div class="right-num">IX</div><div class="right-body"><div class="right-title">Revogação do consentimento</div><div class="right-desc">Retirar o consentimento a qualquer momento, de forma gratuita e facilitada</div></div></div>
+      <div class="right-card" style="margin-bottom:1rem;"><div class="right-num">X</div><div class="right-body"><div class="right-title">Peticionar à ANPD</div><div class="right-desc">Apresentar reclamação diretamente à ANPD contra o controlador em caso de descumprimento</div></div></div>
+
+      <p class="section-title">Direitos especiais</p>
+      <div class="info-card full" style="margin-bottom:10px;">
+        <div class="card-label">art. 20 — revisão de decisões automatizadas</div>
+        <div class="card-value">Solicitar revisão de decisões tomadas com base em tratamento automatizado (profiling)</div>
+        <div class="card-detail">Inclui decisões que afetam perfil pessoal, profissional, de consumo, de crédito ou aspectos da personalidade</div>
+      </div>
+      <div class="info-card full" style="margin-bottom:10px;">
+        <div class="card-label">art. 21 — proteção no exercício de direitos</div>
+        <div class="card-value">Dados usados para o exercício regular de direitos não podem ser utilizados em prejuízo do titular</div>
+      </div>
+      <div class="info-card full accent">
+        <div class="card-label">art. 22 — tutela coletiva</div>
+        <div class="card-value">A defesa dos direitos dos titulares pode ser exercida em juízo de forma individual ou coletiva</div>
+        <div class="card-detail">Por meio de Defensoria Pública, Ministério Público, Procon, IDEC ou diretamente pelo Judiciário</div>
+      </div>
+    </div>
+
+    <!-- NOVA SEÇÃO: DPO/ENCARREGADO -->
+    <div id="dpo" class="section">
+      <p class="section-title">Encarregado (DPO) — art. 41</p>
+
+      <div class="highlight-box"><strong>Definição — art. 5º, VIII:</strong> Pessoa indicada pelo controlador e operador para atuar como <strong>canal de comunicação</strong> entre o controlador, os titulares dos dados e a ANPD.</div>
+
+      <div style="background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1rem;margin-bottom:1rem;">
+        <p style="font-size:0.78rem;color:var(--color-text-secondary);margin-bottom:0.8rem;font-family:'Space Mono',monospace;letter-spacing:0.04em;">POSIÇÃO DO ENCARREGADO</p>
+        <div style="display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:center;gap:8px;">
+          <div class="dpo-node"><div class="dpo-icon">🏢</div><div class="dpo-lbl">Controlador</div></div>
+          <div class="dpo-arrow">⇄</div>
+          <div class="dpo-node dpo-center"><div style="font-size:18px;margin-bottom:6px;color:#FF781E;">⚖</div><div class="dpo-lbl">Encarregado<br>DPO</div></div>
+          <div class="dpo-arrow">⇄</div>
+          <div class="dpo-node"><div class="dpo-icon">👥</div><div class="dpo-lbl">Titulares / ANPD</div></div>
+        </div>
+      </div>
+
+      <p class="section-title">Atribuições legais — art. 41, §2º</p>
+      <div class="sanctions-list">
+        <div class="sanction-item"><div class="sanction-dot"></div>Aceitar reclamações e comunicações dos titulares, prestar esclarecimentos e adotar providências</div>
+        <div class="sanction-item"><div class="sanction-dot"></div>Receber comunicações da ANPD e adotar as providências necessárias</div>
+        <div class="sanction-item"><div class="sanction-dot"></div>Orientar funcionários e contratados sobre práticas de proteção de dados</div>
+        <div class="sanction-item"><div class="sanction-dot"></div>Executar demais atribuições determinadas pelo controlador ou por normas complementares</div>
+        <div class="sanction-item"><div class="sanction-dot"></div>Auxiliar na análise de contratos e cláusulas relacionadas à proteção de dados (Guia ANPD)</div>
+        <div class="sanction-item"><div class="sanction-dot"></div>Apoiar na comunicação de incidentes de segurança à ANPD</div>
+      </div>
+
+      <p class="section-title">Características do cargo</p>
+      <div class="card-grid">
+        <div class="info-card"><div class="card-label">quem pode ser</div><div class="card-value">Pessoa física ou jurídica</div><div class="card-detail">Interno ou externo (DPO as a Service). Sem pré-requisitos legais, mas exige conhecimento especializado em proteção de dados</div></div>
+        <div class="info-card"><div class="card-label">divulgação obrigatória</div><div class="card-value">Identidade e contato públicos</div><div class="card-detail">Preferencialmente no site do controlador, de forma clara e acessível</div></div>
+        <div class="info-card"><div class="card-label">responsabilidade</div><div class="card-value">Não é o responsável legal pelo tratamento</div><div class="card-detail">A responsabilidade é do controlador e do operador. O DPO orienta e intermedia</div></div>
+        <div class="info-card"><div class="card-label">conflito de interesses</div><div class="card-value">Deve ser evitado</div><div class="card-detail">Não indicar quem decide sobre dados (CEO, CFO, head de TI, RH) para evitar supervisão de si mesmo</div></div>
+      </div>
+
+      <p class="section-title">Obrigatoriedade — Res. CD/ANPD nº 2/2022</p>
+      <div class="bases-table">
+        <div class="bt-row bt-header"><div>tipo de organização</div><div style="text-align:center;font-size:9px;">obrig.</div><div style="text-align:center;font-size:9px;">canal</div></div>
+        <div class="bt-row"><div class="bt-base">Grandes e médias empresas</div><div><div class="check-yes">✓</div></div><div><div class="check-yes">✓</div></div></div>
+        <div class="bt-row"><div class="bt-base">Microempresas e EPP</div><div><div class="check-no">✗</div></div><div><div class="check-yes">✓</div></div></div>
+        <div class="bt-row"><div class="bt-base">Startups</div><div><div class="check-no">✗</div></div><div><div class="check-yes">✓</div></div></div>
+        <div class="bt-row"><div class="bt-base">Entidades sem fins lucrativos</div><div><div class="check-no">✗</div></div><div><div class="check-yes">✓</div></div></div>
+      </div>
+      <div class="highlight-box" style="margin-top:0;">Mesmo dispensadas, a indicação do encarregado é considerada <strong>boa prática</strong> e pode reduzir sanções. Em qualquer caso, o controlador deve manter um <strong>canal de comunicação</strong> com os titulares.</div>
+    </div>
+
+    <div id="sancoes" class="section">
+      <p class="section-title">Sanções administrativas — art. 52</p>
+      <div class="fine-card"><div class="fine-amount">R$ 50.000.000</div><div class="fine-label">multa máxima por infração</div></div>
+      <div class="sanctions-list">
+        <div class="sanction-item"><div class="sanction-dot"></div>Advertência com prazo para correção</div>
+        <div class="sanction-item"><div class="sanction-dot"></div>Multa simples de até 2% do faturamento</div>
+        <div class="sanction-item"><div class="sanction-dot"></div>Multa diária</div>
+        <div class="sanction-item"><div class="sanction-dot"></div>Publicização da infração</div>
+        <div class="sanction-item"><div class="sanction-dot"></div>Bloqueio dos dados pessoais</div>
+        <div class="sanction-item"><div class="sanction-dot"></div>Eliminação dos dados pessoais</div>
+        <div class="sanction-item"><div class="sanction-dot"></div>Proibição parcial ou total de atividades</div>
+      </div>
+      <p class="section-title" style="margin-top:1.2rem;">Fluxo do processo sancionador</p>
+      <div class="incident-flow">
+        <div class="if-step"><div class="if-num">1</div><div class="if-content"><div class="if-title">Origem do processo</div><div class="if-desc">Pela própria ANPD, por monitoramento ou por requerimento do titular / denúncia</div></div></div>
+        <div class="if-connector"></div>
+        <div class="if-step"><div class="if-num">2</div><div class="if-content"><div class="if-title">Análise de admissibilidade</div><div class="if-desc">Fase preparatória opcional caso faltem indícios suficientes</div></div></div>
+        <div class="if-connector"></div>
+        <div class="if-step"><div class="if-num">3</div><div class="if-content"><div class="if-title">Processo Administrativo Sancionador</div><div class="if-desc">Julgado pela Coordenação-Geral de Fiscalização da ANPD</div></div></div>
+        <div class="if-connector"></div>
+        <div class="if-step"><div class="if-num">4</div><div class="if-content"><div class="if-title">Resultado: arquivamento ou sanção</div><div class="if-desc">Decisão passível de recurso ao Conselho Diretor da ANPD</div></div></div>
+      </div>
+      <div class="highlight-box">A <strong>adoção de boas práticas e governança</strong> é critério considerado na aplicação das sanções (art. 52, §1º, IX).</div>
+    </div>
+
+    <div id="seguranca" class="section">
+      <p class="section-title">Incidentes de segurança</p>
+      <div class="info-card full accent" style="margin-bottom:12px;"><div class="card-label">definição — Res. CD/ANPD nº 15/2024</div><div class="card-value">Qualquer evento adverso confirmado relacionado à violação das propriedades de confidencialidade, integridade, disponibilidade e autenticidade de dados pessoais</div></div>
+      <p class="section-title" style="margin-top:1.2rem;">Quando comunicar à ANPD?</p>
+      <div class="highlight-box">Apenas quando o incidente puder acarretar <strong>risco ou dano relevante</strong> aos titulares — afetando significativamente seus interesses ou direitos fundamentais, ou envolvendo dados sensíveis, de crianças/adolescentes/idosos.</div>
+      <p class="section-title" style="margin-top:1.2rem;">Processo de comunicação</p>
+      <div class="incident-flow">
+        <div class="if-step"><div class="if-num">1</div><div class="if-content"><div class="if-title">Identificação do incidente</div><div class="if-desc">Confirmação do evento adverso com violação de dados pessoais</div></div></div>
+        <div class="if-connector"></div>
+        <div class="if-step"><div class="if-num">2</div><div class="if-content"><div class="if-title">Avaliação de risco</div><div class="if-desc">Verificar se há risco relevante aos titulares para determinar obrigatoriedade</div></div></div>
+        <div class="if-connector"></div>
+        <div class="if-step"><div class="if-num">3</div><div class="if-content"><div class="if-title">Comunicação à ANPD</div><div class="if-desc">Em até <strong style="color:#FF781E;">3 dias úteis</strong> pelo site gov.br/anpd — feita pelo controlador ou encarregado</div></div></div>
+        <div class="if-connector"></div>
+        <div class="if-step"><div class="if-num">4</div><div class="if-content"><div class="if-title">Avaliação pela ANPD</div><div class="if-desc">ANPD pode determinar providências; inação pode abrir processo administrativo sancionador</div></div></div>
+      </div>
+      <p class="section-title" style="margin-top:1.2rem;">Boas práticas (art. 50)</p>
+      <div class="sanctions-list">
+        <div class="sanction-item"><div class="sanction-dot"></div>Políticas e procedimentos internos de proteção</div>
+        <div class="sanction-item"><div class="sanction-dot"></div>Privacy by Design — privacidade desde a concepção</div>
+        <div class="sanction-item"><div class="sanction-dot"></div>Alinhamento com ISO/IEC 27001</div>
+        <div class="sanction-item"><div class="sanction-dot"></div>Gestão de contratos com terceiros</div>
+        <div class="sanction-item"><div class="sanction-dot"></div>Cultura organizacional de proteção de dados</div>
+        <div class="sanction-item"><div class="sanction-dot"></div>Ações educativas para funcionários</div>
+      </div>
+    </div>
+
+    <!-- NOVA SEÇÃO: ROPA -->
+    <div id="ropa" class="section">
+      <p class="section-title">Projeto ROPA — art. 37</p>
+
+      <div class="highlight-box"><strong>ROPA</strong> (Record of Processing Activities) = <strong>Registro de Operações de Tratamento de Dados Pessoais</strong>. Documento que detalha todo o ciclo de vida dos dados pessoais na organização — da coleta à exclusão.</div>
+
+      <div class="card-grid">
+        <div class="info-card accent"><div class="card-label">fundamento legal</div><div class="card-value">Art. 37 da LGPD</div><div class="card-detail">Controlador e operador devem manter o registro, especialmente quando a base legal for legítimo interesse</div></div>
+        <div class="info-card"><div class="card-label">quem elabora</div><div class="card-value">Controlador e operador</div><div class="card-detail">Pode ser solicitado pela ANPD a qualquer momento para verificar conformidade</div></div>
+      </div>
+
+      <p class="section-title" style="margin-top:1.2rem;">O que deve constar no ROPA</p>
+      <div class="tag-row">
+        <span class="tag orange">Agentes de tratamento</span>
+        <span class="tag orange">Finalidade</span>
+        <span class="tag orange">Base legal</span>
+        <span class="tag orange">Categorias de dados</span>
+        <span class="tag">Dados sensíveis</span>
+        <span class="tag">Categorias de titulares</span>
+        <span class="tag">Período de retenção</span>
+        <span class="tag">Local de armazenamento</span>
+        <span class="tag">Compartilhamento</span>
+        <span class="tag">Transferência internacional</span>
+        <span class="tag">Medidas de segurança</span>
+        <span class="tag">Critérios de descarte</span>
+      </div>
+
+      <p class="section-title">Como construir o ROPA</p>
+      <div class="ropa-steps">
+        <div class="ropa-step"><div class="rs-num">01 — mapeamento</div><div class="rs-title">Identificar todas as atividades</div><div class="rs-desc">Levantar cada processo que envolva dados pessoais, de cadastros de clientes a câmeras de segurança</div></div>
+        <div class="ropa-step"><div class="rs-num">02 — responsáveis</div><div class="rs-title">Definir controlador e operador</div><div class="rs-desc">Indicar claramente quem decide (controlador) e quem executa (operador) em cada tratamento</div></div>
+        <div class="ropa-step"><div class="rs-num">03 — finalidade</div><div class="rs-title">Documentar base legal e propósito</div><div class="rs-desc">Para cada atividade: qual hipótese do art. 7º ou 11 autoriza o tratamento e qual é a finalidade</div></div>
+        <div class="ropa-step"><div class="rs-num">04 — retenção</div><div class="rs-title">Definir ciclo de vida</div><div class="rs-desc">Quanto tempo cada dado fica armazenado e como será descartado ou anonimizado</div></div>
+        <div class="ropa-step"><div class="rs-num">05 — segurança</div><div class="rs-title">Registrar medidas adotadas</div><div class="rs-desc">Controles técnicos e administrativos implementados para proteção de cada categoria de dados</div></div>
+        <div class="ropa-step"><div class="rs-num">06 — atualização</div><div class="rs-title">Manter o documento vivo</div><div class="rs-desc">Revisar periodicamente; qualquer novo processo ou mudança deve refletir no ROPA imediatamente</div></div>
+      </div>
+
+      <p class="section-title">Exemplo de registro</p>
+      <div class="ropa-block">
+        <div class="ropa-header">Atividade: cadastro de clientes</div>
+        <div class="ropa-row"><span class="ropa-key">Controlador</span><span class="ropa-val">Flores de Abril Ltda.</span></div>
+        <div class="ropa-row"><span class="ropa-key">Finalidade</span><span class="ropa-val">Gestão comercial e emissão de nota fiscal</span></div>
+        <div class="ropa-row"><span class="ropa-key">Base legal</span><span class="ropa-val">Execução de contrato (art. 7º, V)</span></div>
+        <div class="ropa-row"><span class="ropa-key">Dados tratados</span><span class="ropa-val">Nome, CPF, e-mail, endereço</span></div>
+        <div class="ropa-row"><span class="ropa-key">Titulares</span><span class="ropa-val">Clientes pessoas físicas</span></div>
+        <div class="ropa-row"><span class="ropa-key">Retenção</span><span class="ropa-val">5 anos após encerramento do contrato</span></div>
+        <div class="ropa-row"><span class="ropa-key">Operadores</span><span class="ropa-val">Sistema CRM (SaaS)</span></div>
+        <div class="ropa-row"><span class="ropa-key">Segurança</span><span class="ropa-val">Criptografia em trânsito, acesso por senha, backup diário</span></div>
+      </div>
+
+      <div class="highlight-box">O ROPA é um dos primeiros documentos solicitados pela ANPD em uma fiscalização. Empresas sem ROPA atualizado ficam expostas a <strong>multas, bloqueio de dados e sanções reputacionais</strong>. Pode ser feito em planilha, documento Word ou plataforma especializada.</div>
+
+      <p class="section-title">ROPA vs. RIPD</p>
+      <div class="card-grid">
+        <div class="info-card accent"><div class="card-label">ROPA</div><div class="card-value">Registro contínuo de todas as atividades</div><div class="card-detail">Documento operacional, sempre atualizado. Base para demonstrar conformidade cotidiana</div></div>
+        <div class="info-card"><div class="card-label">RIPD / DPIA</div><div class="card-value">Relatório de Impacto pontual</div><div class="card-detail">Exigido quando o tratamento pode gerar alto risco a direitos fundamentais ou for baseado em legítimo interesse</div></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+function showTab(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+}
+function togglePrinciple(el, key) {
+  var detail = document.getElementById('detail-' + key);
+  var isOpen = detail.classList.contains('show');
+  document.querySelectorAll('.principle-detail').forEach(d => d.classList.remove('show'));
+  document.querySelectorAll('.principle-card').forEach(c => c.classList.remove('selected'));
+  if (!isOpen) { detail.classList.add('show'); el.classList.add('selected'); }
+}
+</script>
